@@ -17,6 +17,7 @@ class ExchangeRateProvider(models.Model):
 class ExchangeRate(models.Model):
     base_currency = models.CharField(max_length=20)
     currency = models.CharField(max_length=20)
+    date = models.CharField(max_length=20)
 
     sale_rate = models.DecimalField(max_digits=10, decimal_places=4)
     buy_rate = models.DecimalField(max_digits=10, decimal_places=4)
