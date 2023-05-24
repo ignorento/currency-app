@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
-from currency.models import ExchangeRateProvider
-from currency.services import ExchangeRatesService, ProviderService
+from currency.models import ExchangeRateProvider  # noqa
+from currency.services import ExchangeRatesService, ProviderService  # noqa
 
 
 # Create your views here.
@@ -16,5 +16,5 @@ def index(request):
     # provider = ProviderService(name=providers['name'], api_url=providers['api_url']).get_or_create()
     # print(provider)
     service = ExchangeRatesService(name=providers['name'], api_url=providers['api_url'])
-    rates = service.get_rates()
+    rates = service.get_rates()  # noqa
     return render(request, 'core/index.html')

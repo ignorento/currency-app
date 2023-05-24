@@ -20,11 +20,14 @@ class ProviderService:
     #     }
     #     return provider
 
+
 class ExchangeRatesService:
 
     CURRENCIES = ['GBP', 'USD', 'CHF', 'EUR']
+
     # очищает базу перед парсингом и записью в базу
     # ExchangeRate.objects.all().delete()
+
     def __init__(self, name, api_url):
         self.name = name
         self.api_url = api_url
@@ -55,7 +58,6 @@ class ExchangeRatesService:
 
             start_date += datetime.timedelta(days=1)
 
-
     def get_rate(self, date=None):
         # url = "https://api.privatbank.ua/p24api/exchange_rates"
 
@@ -75,7 +77,6 @@ class ExchangeRatesService:
         currency_rates = []
         base_currency = data["baseCurrencyLit"]
         date = data['date']
-
 
         for r in rates:
             if r['currency'] not in self.CURRENCIES:
