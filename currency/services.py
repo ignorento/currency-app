@@ -1,3 +1,5 @@
+import json
+
 import requests
 import datetime
 
@@ -13,13 +15,6 @@ class ProviderService:
         provider = ExchangeRateProvider.objects.get_or_create(name=self.name, api_url=self.api_url)[0]
         return provider
 
-    # def add_provider(self):
-    #     provider = {
-    #         'name': self.name,
-    #         'api_url': self.url
-    #     }
-    #     return provider
-
 
 class ExchangeRatesService:
 
@@ -31,38 +26,48 @@ class ExchangeRatesService:
     def __init__(self, name, api_url):
         self.name = name
         self.api_url = api_url
-        self.provider = ProviderService(name=self.name, api_url=self.api_url).get_or_create()
+        self.provider = ProviderService(**self.__dict__).get_or_create()
 
     def get_rates(self):
-        start_date = datetime.datetime(2023, 1, 1)
+        start_date = datetime.datetime(2023, 5, 14)
         end_date = datetime.datetime.now()
 
         while start_date < end_date:
-            currency_rates = self.get_rate(date=start_date)
-            print(currency_rates)
-            if isinstance(currency_rates, str):
-                break
-            exchange_rates = [
-                ExchangeRate(
-                    base_currency=item['base_currency'],
-                    currency=item['currency'],
-                    date=item['date'],
-                    sale_rate=item['sale_rate'],
-                    buy_rate=item['buy_rate'],
-                    provider_id=item['provider_id']
-                )
-                for item in currency_rates
-            ]
+            start_date_format = start_date.strftime("%d.%m.%Y")
 
-            ExchangeRate.objects.bulk_create(exchange_rates)
+            if not self.date_check(start_date_format):
+                currency_rates = self.get_rate(date=start_date_format)
+                print(currency_rates)
+
+                if isinstance(currency_rates, str):
+                    break
+
+                self.add_to_db(currency_rates)
+                # exchange_rates = [
+                #     ExchangeRate(
+                #         base_currency=item['base_currency'],
+                #         currency=item['currency'],
+                #         date=item['date'],
+                #         sale_rate=item['sale_rate'],
+                #         buy_rate=item['buy_rate'],
+                #         provider_id=item['provider_id']
+                #     )
+                #     for item in currency_rates
+                # ]
+                #
+                # ExchangeRate.objects.bulk_create(exchange_rates)
+
+            else:
+                print(f'exchange rate for the {start_date_format} date is already in the database')
 
             start_date += datetime.timedelta(days=1)
 
-    def get_rate(self, date=None):
-        # url = "https://api.privatbank.ua/p24api/exchange_rates"
+        sorted_db_by_time = ExchangeRate.objects.all().order_by('date').values()
+        return sorted_db_by_time
 
+    def get_rate(self, date=None):
         params = {
-            "date": date.strftime("%d.%m.%Y")
+            "date": date
         }
         response = requests.get(self.provider.api_url, params=params)
         data = response.json()
@@ -95,3 +100,32 @@ class ExchangeRatesService:
             )
 
         return currency_rates
+
+    @staticmethod
+    def date_check(date):
+        my_date_in_db = (
+            ExchangeRate.objects.
+            filter(
+                date=date
+            )
+            .first()
+        )
+        if my_date_in_db:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def add_to_db(currency_rates):
+        exchange_rates = [
+            ExchangeRate(
+                base_currency=item['base_currency'],
+                currency=item['currency'],
+                date=item['date'],
+                sale_rate=item['sale_rate'],
+                buy_rate=item['buy_rate'],
+                provider_id=item['provider_id']
+            )
+            for item in currency_rates
+        ]
+        ExchangeRate.objects.bulk_create(exchange_rates)
