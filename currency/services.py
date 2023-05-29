@@ -65,27 +65,6 @@ class ExchangeRatesService:
                     self.add_to_db(currency_rates)
                     print(currency_rates)
 
-                # if isinstance(currency_rates, str):
-                #     break
-
-                # self.add_to_db(currency_rates)
-                # exchange_rates = [
-                #     ExchangeRate(
-                #         base_currency=item['base_currency'],
-                #         currency=item['currency'],
-                #         date=item['date'],
-                #         sale_rate=item['sale_rate'],
-                #         buy_rate=item['buy_rate'],
-                #         provider_id=item['provider_id']
-                #     )
-                #     for item in currency_rates
-                # ]
-                #
-                # ExchangeRate.objects.bulk_create(exchange_rates)
-
-            # else:
-            #     print(f'exchange rate for the {start_date_format} date is already in the database')
-            #
                 start_date += datetime.timedelta(days=1)
 
         sorted_db_by_time = ExchangeRate.objects.all().order_by('date').values()
