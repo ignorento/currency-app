@@ -14,6 +14,7 @@ def task(x):
     print(f"_________{thread_id % 100}_____________")
     return result
 
+
 def fast_task():
     time.sleep(2)
     print("Execute fast task")

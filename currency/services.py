@@ -22,13 +22,12 @@ class ExchangeRatesService:
     CURRENCIES = ['GBP', 'USD', 'CHF', 'EUR']
 
     # очищает базу перед парсингом и записью в базу
-    ExchangeRate.objects.all().delete()
+    # ExchangeRate.objects.all().delete()
 
     def __init__(self, name, api_url):
         self.name = name
         self.api_url = api_url
         self.provider = ProviderService(**self.__dict__).get_or_create()
-
 
     def process_date(self, date):
         # Ваш код для обработки каждой даты
@@ -40,7 +39,7 @@ class ExchangeRatesService:
             return currency_rates
         else:
             print(f'exchange rate for the {date} date is already in the database')
-
+            return None
 
     def get_rates(self):
         start_test = datetime.datetime.now()
@@ -60,13 +59,7 @@ class ExchangeRatesService:
             for future in concurrent.futures.as_completed(futures):
                 currency_rates = future.result()
                 if currency_rates:
-        # while start_date < end_date:
-        #     start_date_format = start_date.strftime("%d.%m.%Y")
 
-            ## if self.date_check(start_date_format):
-                # future = executor.submit(self.get_rate, start_date_format)
-                ## currency_rates = self.get_rate(date=start_date_format)
-                # currency_rates = future.result()
                     self.add_to_db(currency_rates)
                     print(currency_rates)
 
