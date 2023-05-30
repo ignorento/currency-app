@@ -22,7 +22,7 @@ class ExchangeRatesService:
     CURRENCIES = ['GBP', 'USD', 'CHF', 'EUR']
 
     # очищает базу перед парсингом и записью в базу
-    ExchangeRate.objects.all().delete()
+    # ExchangeRate.objects.all().delete()
 
     def __init__(self, name, api_url):
         self.name = name
